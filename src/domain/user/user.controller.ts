@@ -1,0 +1,75 @@
+import { Controller, Get, Post, Body, Patch, Param, Inject, Delete, Query } from '@nestjs/common';
+import { UserService } from './user.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { Controller as BaseController } from '../../components/abstract/controller';
+import { REQUEST } from '@nestjs/core';
+import { Request } from 'express';
+import { ResourceNotFoundExcepion } from '../../components/Exceptions/ResourceNotFoundExcepion';
+import { ValidateIdPipe } from '../../components/pipes/ValidateId.pipe';
+import { PaginationDto } from '../../components/dto/PaginationDto';
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
+import { LoginDTO } from './dto/login.dto';
+
+@Controller('user')
+export class UserController extends BaseController {
+    constructor(
+        @Inject(REQUEST)
+        protected readonly request: Request,
+        protected readonly service: UserService,
+    ) {
+        super(request, service);
+    }
+
+    @Post('/login')
+    async login(@Body() loginDTO: LoginDTO) {
+        return this.response(await this.service.authenticate(loginDTO.username, loginDTO.password));
+    }
+
+    async register() {
+
+    }
+
+    @Get(':id')
+    async findOne(@Param('id', ValidateIdPipe) id: number) {
+        return super.findOne(id);
+    }
+
+    @Get()
+    @ApiExcludeEndpoint()
+    /**
+     * ! Only delete this if you're going to use it
+     */
+    async findAll(@Query() options: PaginationDto) {
+        throw new ResourceNotFoundExcepion();
+
+        return super.findAll(options);
+    }
+
+    @Post()
+    async create(@Body() createDto: CreateUserDto) {
+        return super.create(createDto);
+    }
+
+    @Patch(':id')
+    @ApiExcludeEndpoint()
+    /**
+     * ! Only delete this if you're going to use it
+     */
+    async update(@Param('id', ValidateIdPipe) id: number, @Body() updateDto: UpdateUserDto) {
+        throw new ResourceNotFoundExcepion();
+
+        return super.update(id, updateDto)
+    }
+
+    @Delete(':id')
+    @ApiExcludeEndpoint()
+    /**
+     * ! Only delete this if you're going to use it
+     */
+    async remove(@Param('id', ValidateIdPipe) id: number) {
+        throw new ResourceNotFoundExcepion();
+
+        return super.remove(id);
+    }
+}
