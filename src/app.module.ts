@@ -1,7 +1,7 @@
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { BullModule } from '@nestjs/bull';
-import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { EventEmitterModule } from '@nestjs/event-emitter';
@@ -36,6 +36,9 @@ export class AppModule {
     constructor(private dataSource: DataSource) {}
     
     configure(consumer: MiddlewareConsumer) {
-        consumer.apply(AuthMiddleware).exclude('/user/login').forRoutes('/');
+        consumer.apply(AuthMiddleware).exclude(
+            '/user/login',
+            { path: '/user', method: RequestMethod.POST }
+        ).forRoutes('/');
     }
 }
